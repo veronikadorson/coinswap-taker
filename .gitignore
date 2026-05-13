@@ -1,0 +1,6 @@
+.npm/
+.claude/
+.ssh/
+.cache/
+.gitconfig
+*.log
