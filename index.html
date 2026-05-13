@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coinswap Taker — Design</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #08080a;
+    color: #e8e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 560px; padding: 48px 24px; }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 40px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: #E85002;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .logo-name { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+  .logo-sub { font-size: 13px; color: #666; margin-top: 2px; }
+  h1 { font-size: 13px; font-weight: 500; color: #555; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+  .list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #101014;
+    border: 1px solid #1c1c22;
+    border-radius: 10px;
+    padding: 16px 20px;
+    color: #e8e8f0;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .list a:hover { background: #16161a; border-color: #E85002; }
+  .list a .arrow { color: #444; font-size: 18px; }
+  .list a:hover .arrow { color: #E85002; }
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(232,80,2,0.15);
+    color: #E85002;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-icon">₿</div>
+    <div>
+      <div class="logo-name">Coinswap Taker</div>
+      <div class="logo-sub">UI Design Screens</div>
+    </div>
+  </div>
+
+  <h1>Screens</h1>
+  <ul class="list">
+    <li><a href="Coinswap_Taker.html"><span>Welcome / Onboarding</span><span class="arrow">›</span></a></li>
+    <li><a href="Wallet_Creation.html"><span>Wallet Creation</span><span class="arrow">›</span></a></li>
+    <li><a href="Dashboard.html"><span>Dashboard</span><span class="arrow">›</span></a></li>
+    <li><a href="Transactions.html"><span>Transactions</span><span class="arrow">›</span></a></li>
+    <li><a href="UTXOs.html"><span>UTXOs</span><span class="arrow">›</span></a></li>
+  </ul>
+
+  <h1 style="margin-top:32px;">Reference</h1>
+  <ul class="list">
+    <li><a href="Design System.html"><span>Design System</span><span class="tag">Design System</span></a></li>
+  </ul>
+</div>
+</body>
+</html>
