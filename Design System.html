@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Coinswap — Design System</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{
+    /* Surface */
+    --bg: #08080a;
+    --surface-1: #101014;
+    --surface-2: #16161a;
+    --surface-3: #1c1c22;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+
+    /* Text */
+    --text: #f5f5f7;
+    --text-2: #a7a7ad;
+    --text-3: #6c6c72;
+
+    /* Brand */
+    --orange: #E85002;
+    --orange-hover: #FF6A2A;
+    --orange-2: #FF541B;
+    --orange-soft: #ff7a3d;
+    --orange-deep: #b53800;
+
+    /* Signal */
+    --green: #2fbf71;
+    --red:   #ff4d5a;
+    --amber: #ffb547;
+
+    /* Radius */
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-lg: 20px;
+    --r-xl: 32px;
+    --r-pill: 999px;
+
+    /* Type */
+    --f-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --f-mono: ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-sans);-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv11"}
+
+  /* Layout */
+  .wrap{max-width:1180px;margin:0 auto;padding:64px 32px 120px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(8,8,10,0.85);backdrop-filter:blur(12px);z-index:10}
+  .topbar .name{font-family:var(--f-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-2)}
+  .topbar .meta{font-family:var(--f-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);display:flex;gap:14px;align-items:center}
+  .topbar .pip{width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 10px var(--orange)}
+
+  /* Header */
+  .hero{display:flex;flex-direction:column;align-items:flex-start;margin-bottom:64px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 11px 5px 8px;border:1px solid var(--border);border-radius:var(--r-pill);background:rgba(255,255,255,0.02);font-size:10.5px;color:var(--text-2);font-family:var(--f-mono);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:24px}
+  .eyebrow .pip{width:5px;height:5px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 3px rgba(232,80,2,0.18), 0 0 10px var(--orange)}
+  h1{font-size:64px;font-weight:700;letter-spacing:-0.04em;line-height:0.98;margin:0 0 16px;text-wrap:balance}
+  h1 .accent{color:var(--orange);font-style:italic;font-weight:600}
+  .lede{color:var(--text-2);font-size:16px;line-height:1.55;max-width:640px;margin:0 0 24px;text-wrap:pretty}
+  .breadcrumbs{display:flex;gap:8px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3)}
+  .breadcrumbs span{padding:4px 10px;border:1px solid var(--border);border-radius:var(--r-pill);background:rgba(255,255,255,0.02)}
+
+  /* Section */
+  section{margin-bottom:72px}
+  .section-head{display:flex;align-items:baseline;gap:18px;margin-bottom:28px;border-bottom:1px solid var(--border);padding-bottom:16px}
+  .section-num{font-family:var(--f-mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange)}
+  h2{margin:0;font-size:28px;font-weight:600;letter-spacing:-0.025em;flex:1}
+  .section-sub{color:var(--text-3);font-size:13px;max-width:420px;text-align:right}
+
+  /* Grid utilities */
+  .grid{display:grid;gap:14px}
+  .g-3{grid-template-columns:repeat(3,1fr)}
+  .g-4{grid-template-columns:repeat(4,1fr)}
+  .g-6{grid-template-columns:repeat(6,1fr)}
+  @media (max-width:880px){.g-3,.g-4,.g-6{grid-template-columns:repeat(2,1fr)}}
+
+  /* Color swatches */
+  .swatch{border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);background:var(--surface-2);display:flex;flex-direction:column}
+  .swatch .chip{height:96px;position:relative}
+  .swatch .meta{padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+  .swatch .name{font-size:13px;font-weight:500}
+  .swatch .val{font-family:var(--f-mono);font-size:10.5px;color:var(--text-3);letter-spacing:0.04em}
+  .swatch .role{font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px}
+
+  /* Type scale */
+  .type-row{display:grid;grid-template-columns:120px 1fr 220px;gap:24px;align-items:baseline;padding:18px 0;border-top:1px solid var(--border)}
+  .type-row:first-child{border-top:0}
+  .type-tag{font-family:var(--f-mono);font-size:11px;color:var(--orange);letter-spacing:0.12em;text-transform:uppercase}
+  .type-specs{font-family:var(--f-mono);font-size:11px;color:var(--text-3);text-align:right;letter-spacing:0.04em}
+
+  /* Component card */
+  .demo{
+    border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface-2);
+    padding:28px;display:flex;flex-direction:column;gap:16px;position:relative;
+  }
+  .demo .label{position:absolute;top:14px;right:14px;font-family:var(--f-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3)}
+  .demo-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .demo-stack{display:flex;flex-direction:column;gap:10px}
+
+  /* Components — reused from product */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    height:46px;padding:0 22px;border-radius:var(--r-md);border:0;cursor:pointer;
+    font-family:inherit;font-size:13.5px;font-weight:600;letter-spacing:-0.005em;color:#fff;
+    background: var(--orange);
+    transition: background 0.2s, transform 0.2s;
+  }
+  .btn:hover{background:var(--orange-hover);transform:translateY(-1px)}
+  .btn[disabled]{opacity:0.45;cursor:not-allowed;transform:none}
+  .btn.secondary{background:rgba(255,255,255,0.05);color:var(--text);border:1px solid var(--border-strong)}
+  .btn.secondary:hover{background:rgba(255,255,255,0.08)}
+  .btn.ghost{background:transparent;color:var(--text-2)}
+  .btn.ghost:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+  .btn.sm{height:34px;padding:0 14px;font-size:12px;border-radius:10px}
+  .btn.lg{height:54px;padding:0 28px;font-size:15px}
+
+  /* Spec chip */
+  .spec{padding:5px 9px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-2);font-family:var(--f-mono);font-size:10.5px;display:inline-flex;gap:4px}
+  .spec b{color:var(--text);font-weight:500}
+
+  /* Status row */
+  .status-row{
+    display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;
+    background:rgba(255,255,255,0.03);border:1px solid var(--border);font-family:var(--f-mono);font-size:10.5px;min-width:280px;
+  }
+  .status-row .label{color:var(--text);letter-spacing:0.05em;min-width:54px}
+  .status-row .msg{margin-left:auto;color:var(--text-3);text-align:right}
+  .status-row .indicator{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .status-row.ok .indicator{background:rgba(47,191,113,0.15);color:var(--green)}
+  .status-row.ok .msg{color:var(--green)}
+  .status-row.err .indicator{background:rgba(255,77,90,0.15);color:var(--red)}
+  .status-row.err .msg{color:var(--red)}
+  .status-row.pending .indicator{background:rgba(255,255,255,0.06);color:var(--text-2)}
+  .spinner{width:11px;height:11px;border-radius:50%;border:2px solid rgba(255,255,255,0.18);border-top-color:var(--orange);animation:spin 0.8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Card */
+  .card{
+    position:relative;border-radius:var(--r-lg);padding:22px;background:var(--surface-2);
+    border:1px solid var(--border);min-width:280px;max-width:340px;
+  }
+  .card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .num{
+    width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13px;color:#fff;flex-shrink:0;background:var(--orange);
+  }
+  .card-head h3{margin:0;font-size:17px;font-weight:600;letter-spacing:-0.015em}
+  .kicker{font-size:10px;color:var(--orange);font-family:var(--f-mono);letter-spacing:0.14em;text-transform:uppercase;display:block;margin-bottom:2px}
+
+  /* Progress */
+  .progress-demo{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:10.5px;color:var(--text-3);letter-spacing:0.1em;text-transform:uppercase}
+  .progress-bar{position:relative;width:200px;height:3px;border-radius:var(--r-pill);background:rgba(255,255,255,0.06);overflow:hidden}
+  .progress-bar::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w,50%);background:linear-gradient(90deg,var(--orange),var(--orange-2));border-radius:var(--r-pill);box-shadow:0 0 12px rgba(232,80,2,0.6)}
+
+  /* Radius / spacing showcase */
+  .radius-demo{display:flex;align-items:flex-end;gap:18px}
+  .radius-box{width:80px;height:80px;background:var(--surface-3);border:1px solid var(--border-strong);display:flex;align-items:flex-end;justify-content:center;padding:6px;font-family:var(--f-mono);font-size:10px;color:var(--text-3)}
+
+  .scale-demo{display:flex;align-items:flex-end;gap:14px}
+  .scale-bar{background:var(--orange);border-radius:4px;width:24px;position:relative;display:flex;justify-content:center;align-items:flex-end;color:#fff;font-family:var(--f-mono);font-size:9px;padding-bottom:4px}
+
+  /* Iconography */
+  .icon-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+  .icon-tile{border:1px solid var(--border);background:var(--surface-2);border-radius:var(--r-md);aspect-ratio:1;display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:color 0.2s, border-color 0.2s}
+  .icon-tile:hover{color:var(--orange);border-color:rgba(232,80,2,0.5)}
+  .ic{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Principles */
+  .principles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media (max-width:880px){.principles{grid-template-columns:1fr}}
+  .principle{padding:22px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface-2)}
+  .principle .num-p{font-family:var(--f-mono);color:var(--orange);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;display:block}
+  .principle h4{margin:0 0 8px;font-size:17px;font-weight:600;letter-spacing:-0.015em}
+  .principle p{margin:0;color:var(--text-2);font-size:13px;line-height:1.55}
+
+  /* Footer */
+  footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:11px;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="name">Coinswap · Design System v0.1</div>
+  <div class="meta"><span class="pip"></span>May 2026 · Internal</div>
+</header>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow"><span class="pip"></span>Design System · Onboarding lineage</div>
+    <h1>The system, <span class="accent">unpacked.</span></h1>
+    <p class="lede">A dark, utility-first language for Coinswap. Built around a single brand orange, a quiet neutral ramp, monospaced metadata, and components that earn their place. Every token below is in production on the Taker onboarding screen.</p>
+    <div class="breadcrumbs">
+      <span>Tokens</span><span>Type</span><span>Components</span><span>Patterns</span>
+    </div>
+  </div>
+
+  <!-- PRINCIPLES -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">00 — Principles</span>
+      <h2>What this system optimizes for.</h2>
+      <span class="section-sub">Three rules every screen has to pass.</span>
+    </div>
+    <div class="principles">
+      <div class="principle">
+        <span class="num-p">01</span>
+        <h4>Utility over ornament.</h4>
+        <p>No drop shadows for decoration, no gradients to hide a weak idea. Surfaces are flat, color is informational, motion happens only when state changes.</p>
+      </div>
+      <div class="principle">
+        <span class="num-p">02</span>
+        <h4>One signal color.</h4>
+        <p>Orange is reserved. It marks primary action, active state, and forward progress — never as background filler. If two things are orange on a screen, one of them is wrong.</p>
+      </div>
+      <div class="principle">
+        <span class="num-p">03</span>
+        <h4>Mono for machine, sans for human.</h4>
+        <p>JetBrains Mono carries technical metadata: ports, hashes, status codes, step counters. Inter carries everything a person reads as prose.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLOR -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">01 — Color</span>
+      <h2>A single signal in a neutral world.</h2>
+      <span class="section-sub">9 neutrals, 1 brand, 3 signals. Anything more is a leak.</span>
+    </div>
+
+    <h3 style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);margin:0 0 14px">Brand</h3>
+    <div class="grid g-4">
+      <div class="swatch"><div class="chip" style="background:#E85002"></div><div class="meta"><span class="name">Orange / 500</span><span class="val">#E85002</span><span class="role">Primary · CTA · Accent</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#FF6A2A"></div><div class="meta"><span class="name">Orange / 400</span><span class="val">#FF6A2A</span><span class="role">Hover</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#FF7A3D"></div><div class="meta"><span class="name">Orange / 300</span><span class="val">#FF7A3D</span><span class="role">Subtle accents</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#b53800"></div><div class="meta"><span class="name">Orange / 700</span><span class="val">#B53800</span><span class="role">Pressed</span></div></div>
+    </div>
+
+    <h3 style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);margin:32px 0 14px">Neutral · Surface</h3>
+    <div class="grid g-6">
+      <div class="swatch"><div class="chip" style="background:#08080a"></div><div class="meta"><span class="name">BG</span><span class="val">#08080A</span><span class="role">Canvas</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#101014"></div><div class="meta"><span class="name">Surface 1</span><span class="val">#101014</span><span class="role">Shell</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#16161a"></div><div class="meta"><span class="name">Surface 2</span><span class="val">#16161A</span><span class="role">Cards</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#1c1c22"></div><div class="meta"><span class="name">Surface 3</span><span class="val">#1C1C22</span><span class="role">Wells</span></div></div>
+      <div class="swatch"><div class="chip" style="background:rgba(255,255,255,0.08);background-color:#222"></div><div class="meta"><span class="name">Border</span><span class="val">#FFF / 8%</span><span class="role">Hairlines</span></div></div>
+      <div class="swatch"><div class="chip" style="background:rgba(255,255,255,0.14);background-color:#333"></div><div class="meta"><span class="name">Border / strong</span><span class="val">#FFF / 14%</span><span class="role">Secondary edge</span></div></div>
+    </div>
+
+    <h3 style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);margin:32px 0 14px">Text</h3>
+    <div class="grid g-3">
+      <div class="swatch"><div class="chip" style="background:#f5f5f7"></div><div class="meta"><span class="name" style="color:#08080a">Text / primary</span><span class="val" style="color:#444">#F5F5F7</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#a7a7ad"></div><div class="meta"><span class="name">Text / secondary</span><span class="val">#A7A7AD</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#6c6c72"></div><div class="meta"><span class="name">Text / tertiary</span><span class="val">#6C6C72</span></div></div>
+    </div>
+
+    <h3 style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);margin:32px 0 14px">Signal</h3>
+    <div class="grid g-3">
+      <div class="swatch"><div class="chip" style="background:#2fbf71"></div><div class="meta"><span class="name">Success</span><span class="val">#2FBF71</span><span class="role">Connection OK</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#ff4d5a"></div><div class="meta"><span class="name">Error</span><span class="val">#FF4D5A</span><span class="role">Failed checks</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#ffb547"></div><div class="meta"><span class="name">Warning</span><span class="val">#FFB547</span><span class="role">Reserved</span></div></div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">02 — Typography</span>
+      <h2>Inter for voice. Mono for facts.</h2>
+      <span class="section-sub">Two families. Six sizes. Everything line-heights to 1.0–1.6.</span>
+    </div>
+
+    <div class="type-row">
+      <span class="type-tag">Display</span>
+      <span style="font-size:52px;font-weight:700;letter-spacing:-0.035em;line-height:1">Let's get you <em style="color:var(--orange);font-weight:600">connected.</em></span>
+      <span class="type-specs">Inter 700 · 52 / 51 · −3.5%</span>
+    </div>
+    <div class="type-row">
+      <span class="type-tag">Title</span>
+      <span style="font-size:28px;font-weight:600;letter-spacing:-0.025em">Test your Bitcoin node</span>
+      <span class="type-specs">Inter 600 · 28 / 32 · −2.5%</span>
+    </div>
+    <div class="type-row">
+      <span class="type-tag">Heading</span>
+      <span style="font-size:17px;font-weight:600;letter-spacing:-0.015em">All systems green — let's go.</span>
+      <span class="type-specs">Inter 600 · 17 / 22 · −1.5%</span>
+    </div>
+    <div class="type-row">
+      <span class="type-tag">Body</span>
+      <span style="font-size:15px;line-height:1.55;color:var(--text-2);max-width:480px">Two quick checks — your Bitcoin node and a Tor proxy. After this, you're ready to swap privately.</span>
+      <span class="type-specs">Inter 400 · 15 / 23</span>
+    </div>
+    <div class="type-row">
+      <span class="type-tag">Caption</span>
+      <span style="font-size:13px;color:var(--text-2)">Routes all swap traffic through Tor.</span>
+      <span class="type-specs">Inter 400 · 13 / 20</span>
+    </div>
+    <div class="type-row">
+      <span class="type-tag">Mono · meta</span>
+      <span style="font-family:var(--f-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3)">Step 01 / 02 · 127.0.0.1:9050</span>
+      <span class="type-specs">JetBrains Mono 500 · 10.5 · +10%</span>
+    </div>
+  </section>
+
+  <!-- SPACING & RADIUS -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">03 — Spacing &amp; Radius</span>
+      <h2>A 4px rhythm with five corners.</h2>
+      <span class="section-sub">Spacing on a 4px base. Radii pair to component scale.</span>
+    </div>
+
+    <h3 style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);margin:0 0 14px">Spacing scale</h3>
+    <div class="demo" style="padding:32px">
+      <div class="scale-demo">
+        <div class="scale-bar" style="height:4px">4</div>
+        <div class="scale-bar" style="height:8px">8</div>
+        <div class="scale-bar" style="height:12px">12</div>
+        <div class="scale-bar" style="height:16px">16</div>
+        <div class="scale-bar" style="height:24px">24</div>
+        <div class="scale-bar" style="height:32px">32</div>
+        <div class="scale-bar" style="height:48px">48</div>
+        <div class="scale-bar" style="height:64px">64</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);margin:32px 0 14px">Radius</h3>
+    <div class="demo">
+      <div class="radius-demo">
+        <div class="radius-box" style="border-radius:8px">8 · sm</div>
+        <div class="radius-box" style="border-radius:12px">12 · md</div>
+        <div class="radius-box" style="border-radius:20px">20 · lg</div>
+        <div class="radius-box" style="border-radius:32px">32 · xl</div>
+        <div class="radius-box" style="border-radius:999px">pill</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPONENTS -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">04 — Components</span>
+      <h2>Earned, not invented.</h2>
+      <span class="section-sub">Every component below already ships on the onboarding screen.</span>
+    </div>
+
+    <!-- Buttons -->
+    <div class="demo" style="margin-bottom:18px">
+      <span class="label">Button</span>
+      <div class="demo-row">
+        <button class="btn">Primary action</button>
+        <button class="btn secondary">Secondary</button>
+        <button class="btn ghost">Ghost · Skip for now</button>
+        <button class="btn" disabled>Disabled</button>
+      </div>
+      <div class="demo-row">
+        <button class="btn sm">Small</button>
+        <button class="btn">Default</button>
+        <button class="btn lg">Large</button>
+      </div>
+    </div>
+
+    <!-- Eyebrows + chips -->
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+      <div class="demo">
+        <span class="label">Eyebrow</span>
+        <div class="demo-row">
+          <span class="eyebrow"><span class="pip"></span>Welcome · First-time setup</span>
+        </div>
+        <div class="demo-row">
+          <span class="eyebrow" style="margin:0"><span class="pip"></span>Onboarding</span>
+          <span class="eyebrow" style="margin:0"><span class="pip" style="background:var(--green);box-shadow:0 0 0 3px rgba(47,191,113,0.18),0 0 10px var(--green)"></span>Connected</span>
+        </div>
+      </div>
+      <div class="demo">
+        <span class="label">Spec chip</span>
+        <div class="demo-row">
+          <span class="spec">RPC<b>:38332</b></span>
+          <span class="spec">ZMQ<b>:28332</b></span>
+          <span class="spec">AUTH<b>cookie</b></span>
+          <span class="spec">SOCKS<b>:9050</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status rows -->
+    <div class="demo" style="margin-bottom:18px">
+      <span class="label">Status row</span>
+      <div class="demo-stack">
+        <div class="status-row ok">
+          <div class="indicator"><svg viewBox="0 0 24 24" style="width:10px;height:10px" stroke="currentColor" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="label" style="color:var(--text)">RPC</div>
+          <div class="msg">200 OK · 7.4 ms</div>
+        </div>
+        <div class="status-row err">
+          <div class="indicator"><svg viewBox="0 0 24 24" style="width:10px;height:10px" stroke="currentColor" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          <div class="label" style="color:var(--text)">ZMQ</div>
+          <div class="msg">cannot connect :28332</div>
+        </div>
+        <div class="status-row pending">
+          <div class="indicator"><div class="spinner"></div></div>
+          <div class="label" style="color:var(--text)">SOCKS</div>
+          <div class="msg">checking…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card -->
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+      <div class="demo">
+        <span class="label">Step card</span>
+        <div class="card">
+          <div class="card-head">
+            <div class="num">1</div>
+            <div>
+              <span class="kicker">Bitcoin</span>
+              <h3>Test your node</h3>
+            </div>
+          </div>
+          <p style="color:var(--text-2);font-size:13px;line-height:1.55;margin:0 0 14px">Checks RPC, REST, and ZMQ access to your local Bitcoin Core.</p>
+          <button class="btn" style="width:100%">Test node connection</button>
+        </div>
+      </div>
+      <div class="demo">
+        <span class="label">Progress</span>
+        <div class="progress-demo">
+          <span>Step 00 / 02</span>
+          <div class="progress-bar" style="--w:8%"></div>
+          <span>0%</span>
+        </div>
+        <div class="progress-demo">
+          <span>Step 01 / 02</span>
+          <div class="progress-bar" style="--w:50%"></div>
+          <span>50%</span>
+        </div>
+        <div class="progress-demo">
+          <span>Step 02 / 02</span>
+          <div class="progress-bar" style="--w:100%"></div>
+          <span>100%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ICONOGRAPHY -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">05 — Iconography</span>
+      <h2>1.6px strokes, rounded joins, 24px box.</h2>
+      <span class="section-sub">Lucide-style line set. Never filled, never multicolor.</span>
+    </div>
+    <div class="icon-grid">
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12l3 3 7-7"/><path d="M11 12l3 3 7-7"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      <div class="icon-tile"><svg class="ic" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0114-5.3L20 8"/><path d="M20 4v4h-4"/><path d="M20 12a8 8 0 01-14 5.3L4 16"/><path d="M4 20v-4h4"/></svg></div>
+    </div>
+  </section>
+
+  <!-- MOTION -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">06 — Motion</span>
+      <h2>Short, soft, signaling state.</h2>
+      <span class="section-sub">Motion belongs to feedback — never decoration.</span>
+    </div>
+    <div class="grid g-3">
+      <div class="demo" style="padding:22px">
+        <span class="label">Spinner</span>
+        <div style="display:flex;align-items:center;gap:14px;height:60px"><div class="spinner" style="width:18px;height:18px;border-width:2.5px"></div><span style="font-family:var(--f-mono);font-size:11px;color:var(--text-3)">linear · 800ms · ∞</span></div>
+      </div>
+      <div class="demo" style="padding:22px">
+        <span class="label">Rise (status row)</span>
+        <div style="height:60px;display:flex;align-items:center;font-family:var(--f-mono);font-size:11px;color:var(--text-3)">cubic-bezier(.2,.8,.2,1) · 400ms · staggered 100ms</div>
+      </div>
+      <div class="demo" style="padding:22px">
+        <span class="label">Hover lift</span>
+        <div style="height:60px;display:flex;align-items:center;font-family:var(--f-mono);font-size:11px;color:var(--text-3)">translateY(-1px) · 200ms · ease-out</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USAGE -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">07 — Usage rules</span>
+      <h2>Don't break the quiet.</h2>
+      <span class="section-sub">A short list of things this system refuses to do.</span>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px">
+      <div class="demo" style="border-color:rgba(47,191,113,0.3)">
+        <span class="label" style="color:var(--green)">Do</span>
+        <ul style="margin:0;padding-left:18px;color:var(--text-2);font-size:13px;line-height:1.7">
+          <li>Use orange to lead the eye to one action per view.</li>
+          <li>Pair every technical value with a mono label.</li>
+          <li>Keep card surfaces flat — borders carry the hierarchy.</li>
+          <li>Let copy breathe — text-wrap:pretty + 1.55 line height.</li>
+        </ul>
+      </div>
+      <div class="demo" style="border-color:rgba(255,77,90,0.3)">
+        <span class="label" style="color:var(--red)">Don't</span>
+        <ul style="margin:0;padding-left:18px;color:var(--text-2);font-size:13px;line-height:1.7">
+          <li>Apply glass blur or gradient washes to surfaces.</li>
+          <li>Use orange for backgrounds, dividers, or icon fills.</li>
+          <li>Mix shadow depths inside a single card.</li>
+          <li>Use Inter for ports, hashes, or step counters.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Coinswap Design System</span>
+    <span>v0.1 · May 2026</span>
+  </footer>
+
+</div>
+
+</body>
+</html>

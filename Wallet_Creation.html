@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Coinswap Taker — Create Wallet</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{
+    --bg:#08080a;
+    --surface-1:#101014;
+    --surface-2:#16161a;
+    --surface-3:#1c1c22;
+    --border:rgba(255,255,255,0.08);
+    --border-strong:rgba(255,255,255,0.14);
+    --text:#f5f5f7;
+    --text-2:#a7a7ad;
+    --text-3:#6c6c72;
+    --orange:#E85002;
+    --orange-hover:#FF6A2A;
+    --orange-2:#FF541B;
+    --green:#2fbf71;
+    --red:#ff4d5a;
+    --amber:#ffb547;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv11"}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+
+  /* App shell */
+  .shell{
+    position:relative;z-index:2;
+    width:min(960px,100%);
+    border-radius:32px;
+    background:#101014;
+    border:1px solid var(--border);
+    box-shadow:0 1px 0 rgba(255,255,255,0.05) inset, 0 40px 120px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02);
+    overflow:hidden;
+  }
+  .titlebar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);position:relative}
+  .traffic{display:flex;gap:8px}
+  .traffic span{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,0.10);display:block}
+  .traffic span:first-child{background:#ff5f57}
+  .titlebar-name{font-size:12px;color:var(--text-3);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.08em;text-transform:uppercase;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+  .titlebar-right{font-size:11px;color:var(--text-3);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 10px var(--orange)}
+
+  .content{padding:48px 52px 44px;position:relative}
+
+  .header{display:flex;flex-direction:column;align-items:flex-start;text-align:left;margin-bottom:32px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 11px 5px 8px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.02);font-size:10.5px;color:var(--text-2);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:18px}
+  .eyebrow .pip{width:5px;height:5px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 3px rgba(232,80,2,0.18), 0 0 10px var(--orange)}
+  h1.title{font-size:clamp(32px,4.4vw,52px);font-weight:700;letter-spacing:-0.035em;line-height:1.0;margin:0 0 14px;text-wrap:balance}
+  h1.title .accent{color:var(--orange);font-style:italic;font-weight:600}
+  .subtitle{color:var(--text-2);font-size:15px;line-height:1.55;max-width:560px;text-wrap:pretty;margin:0}
+
+  /* Tabs (Create / Import) */
+  .tabs{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px;width:fit-content}
+  .tab{padding:8px 18px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;color:var(--text-2);background:transparent;border:0;cursor:pointer;transition:background 0.2s, color 0.2s;display:flex;align-items:center;gap:8px}
+  .tab.active{background:var(--orange);color:#fff}
+  .tab:not(.active):hover{color:var(--text)}
+
+  /* Form */
+  .form{display:flex;flex-direction:column;gap:18px}
+  .field{display:flex;flex-direction:column;gap:8px}
+  .field-head{display:flex;align-items:baseline;justify-content:space-between}
+  .field label{font-size:12px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3)}
+  .field .hint{font-size:11px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;color:var(--text-3);letter-spacing:0.04em}
+  .input-wrap{position:relative;display:flex;align-items:center}
+  .input{
+    width:100%;height:48px;border-radius:12px;background:var(--surface-2);border:1px solid var(--border);
+    padding:0 16px;color:var(--text);font-family:inherit;font-size:14px;outline:none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .input:hover{border-color:var(--border-strong)}
+  .input:focus{border-color:var(--orange);background:var(--surface-3)}
+  .input.has-eye{padding-right:48px}
+  .eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:transparent;border:0;cursor:pointer;color:var(--text-3);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+  .eye:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+
+  /* Password strength */
+  .strength{display:flex;align-items:center;gap:8px;margin-top:2px}
+  .strength-bar{flex:1;height:3px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden}
+  .strength-bar::before{content:"";display:block;height:100%;width:var(--w,0%);background:var(--strength-c, var(--red));transition:width 0.3s, background 0.3s;border-radius:999px}
+  .strength-label{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);min-width:60px;text-align:right}
+
+  /* Wallet type cards */
+  .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:680px){.type-grid{grid-template-columns:1fr}}
+  .type-card{
+    position:relative;padding:16px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border);
+    cursor:pointer;transition:border-color 0.2s, background 0.2s;
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .type-card:hover{border-color:var(--border-strong)}
+  .type-card.selected{border-color:var(--orange);background:var(--surface-3)}
+  .type-card.selected::after{
+    content:"";position:absolute;top:14px;right:14px;width:18px;height:18px;border-radius:50%;
+    background:var(--orange);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 13l4 4L19 7'/></svg>");
+    background-size:11px;background-repeat:no-repeat;background-position:center;
+  }
+  .type-card .row1{display:flex;align-items:center;gap:10px}
+  .type-card .icon{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--orange);flex-shrink:0}
+  .type-card h4{margin:0;font-size:14px;font-weight:600;letter-spacing:-0.01em}
+  .type-card .kicker{font-size:10px;color:var(--orange);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.14em;text-transform:uppercase;display:block;margin-bottom:1px}
+  .type-card p{margin:6px 0 0;color:var(--text-2);font-size:12.5px;line-height:1.5}
+
+  /* Advanced toggle */
+  .advanced{margin-top:6px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);overflow:hidden}
+  .advanced summary{cursor:pointer;list-style:none;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--text-2)}
+  .advanced summary::-webkit-details-marker{display:none}
+  .advanced summary .left{display:flex;align-items:center;gap:10px}
+  .advanced summary .chevron{transition:transform 0.2s}
+  .advanced[open] summary .chevron{transform:rotate(90deg)}
+  .advanced-body{padding:0 18px 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:680px){.advanced-body{grid-template-columns:1fr}}
+
+  /* Notice */
+  .notice{
+    display:flex;gap:12px;padding:14px 16px;border-radius:12px;
+    background:rgba(255,181,71,0.06);border:1px solid rgba(255,181,71,0.25);
+  }
+  .notice .ico{width:28px;height:28px;border-radius:8px;background:rgba(255,181,71,0.15);color:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .notice .body{font-size:13px;color:var(--text-2);line-height:1.55}
+  .notice .body strong{color:var(--text);font-weight:600;display:block;margin-bottom:2px;font-size:13.5px}
+
+  /* Footer / actions */
+  .actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:32px;padding-top:22px;border-top:1px solid var(--border)}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    height:46px;padding:0 22px;border-radius:12px;border:0;cursor:pointer;
+    font-family:inherit;font-size:13.5px;font-weight:600;letter-spacing:-0.005em;color:#fff;
+    background:var(--orange);transition: background 0.2s, transform 0.2s;
+  }
+  .btn:hover{background:var(--orange-hover);transform:translateY(-1px)}
+  .btn[disabled]{opacity:0.45;cursor:not-allowed;transform:none}
+  .btn.ghost{background:transparent;color:var(--text-2);height:auto;padding:8px 12px}
+  .btn.ghost:hover{color:var(--text);background:rgba(255,255,255,0.04);transform:none}
+
+  .ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Match list */
+  .match{display:flex;align-items:center;gap:6px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;letter-spacing:0.04em;color:var(--text-3);margin-top:2px}
+  .match.ok{color:var(--green)}
+  .match.err{color:var(--red)}
+
+  /* Seed grid */
+  .seed-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:14px}
+  @media (max-width:680px){.seed-grid{grid-template-columns:repeat(2,1fr)}}
+  .seed-cell{display:flex;align-items:center;gap:8px;background:var(--surface-3);border:1px solid var(--border);border-radius:10px;padding:8px 10px;transition:border-color 0.2s, background 0.2s}
+  .seed-cell:focus-within{border-color:var(--orange);background:#211910}
+  .seed-cell.has-val{border-color:rgba(47,191,113,0.35)}
+  .seed-cell.invalid{border-color:rgba(255,77,90,0.5)}
+  .seed-cell .n{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;color:var(--text-3);min-width:18px;letter-spacing:0.04em}
+  .seed-cell input{flex:1;background:transparent;border:0;outline:none;color:var(--text);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:12.5px;letter-spacing:0.02em;min-width:0;width:100%}
+  .seed-cell input::placeholder{color:var(--text-3)}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="titlebar">
+    <div class="traffic"><span></span><span></span><span></span></div>
+    <div class="titlebar-name">Coinswap · Taker</div>
+    <div class="titlebar-right"><span class="dot"></span>Wallet</div>
+  </div>
+
+  <div class="content">
+    <div class="header">
+      <div class="eyebrow"><span class="pip"></span>Step 02 · Wallet</div>
+      <h1 class="title">Create your <span class="accent">wallet.</span></h1>
+      <p class="subtitle">Name it, lock it with a password, and pick a script type. The seed lives on this device — never on a server.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-pane="create">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Create new
+      </button>
+      <button class="tab" data-pane="import">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Import seed
+      </button>
+    </div>
+
+    <div class="form" id="pane-create">
+      <!-- Name -->
+      <div class="field">
+        <div class="field-head">
+          <label for="name">Wallet name</label>
+          <span class="hint">stored locally</span>
+        </div>
+        <div class="input-wrap">
+          <input class="input" id="name" type="text" value="taker-main" placeholder="e.g. taker-main" />
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <div class="field-head">
+          <label for="pw">Password</label>
+          <span class="hint">min 12 characters</span>
+        </div>
+        <div class="input-wrap">
+          <input class="input has-eye" id="pw" type="password" placeholder="••••••••••••" />
+          <button class="eye" id="eye" type="button" aria-label="Show password">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="strength">
+          <div class="strength-bar" id="sBar"></div>
+          <span class="strength-label" id="sLabel">Empty</span>
+        </div>
+      </div>
+
+      <!-- Confirm -->
+      <div class="field">
+        <div class="field-head">
+          <label for="pw2">Confirm password</label>
+        </div>
+        <div class="input-wrap">
+          <input class="input" id="pw2" type="password" placeholder="repeat password" />
+        </div>
+        <div class="match" id="match">
+          <svg class="ic" viewBox="0 0 24 24" style="width:11px;height:11px"><circle cx="12" cy="12" r="9"/></svg>
+          <span>Awaiting input</span>
+        </div>
+      </div>
+
+      <!-- Type -->
+      <div class="field">
+        <div class="field-head">
+          <label>Script type</label>
+          <span class="hint">determines address format</span>
+        </div>
+        <div class="type-grid">
+          <div class="type-card selected" data-type="segwit">
+            <div class="row1">
+              <div class="icon">
+                <svg class="ic" viewBox="0 0 24 24"><path d="M6 4l12 8-12 8z"/></svg>
+              </div>
+              <div>
+                <span class="kicker">Recommended</span>
+                <h4>Native SegWit · bc1q</h4>
+              </div>
+            </div>
+            <p>Lowest fees, fastest swaps. Required for HTLC contracts on the Coinswap protocol.</p>
+          </div>
+          <div class="type-card" data-type="taproot">
+            <div class="row1">
+              <div class="icon">
+                <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/></svg>
+              </div>
+              <div>
+                <span class="kicker">Experimental</span>
+                <h4>Taproot · bc1p</h4>
+              </div>
+            </div>
+            <p>Privacy-optimised addresses with single-sig and multisig indistinguishable on-chain.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced -->
+      <details class="advanced">
+        <summary>
+          <span class="left">
+            <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1A2 2 0 113.6 17l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H2a2 2 0 110-4h.1a1.7 1.7 0 001.5-1A1.7 1.7 0 003.3 7.2L3.2 7a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H8a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1A2 2 0 1120.8 7l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H22a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>
+            Advanced options
+          </span>
+          <svg class="ic chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </summary>
+        <div class="advanced-body">
+          <div class="field">
+            <label>Seed length</label>
+            <input class="input" type="text" value="12 words · BIP39" />
+          </div>
+          <div class="field">
+            <label>Passphrase (25th word)</label>
+            <input class="input" type="text" placeholder="optional" />
+          </div>
+        </div>
+      </details>
+
+      <!-- Notice -->
+      <div class="notice">
+        <div class="ico">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        </div>
+        <div class="body">
+          <strong>You'll see your recovery seed on the next screen.</strong>
+          Write it down on paper — it's the only way to restore this wallet. Coinswap can't recover it for you.
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPORT PANE -->
+    <div class="form" id="pane-import" style="display:none">
+      <!-- Name -->
+      <div class="field">
+        <div class="field-head">
+          <label for="iname">Wallet name</label>
+          <span class="hint">stored locally</span>
+        </div>
+        <div class="input-wrap">
+          <input class="input" id="iname" type="text" value="taker-restored" placeholder="e.g. taker-restored" />
+        </div>
+      </div>
+
+      <!-- Seed length toggle -->
+      <div class="field">
+        <div class="field-head">
+          <label>Seed length</label>
+          <span class="hint" id="seedHint">12 of 12 words entered</span>
+        </div>
+        <div class="tabs" style="margin-bottom:0">
+          <button class="tab active" data-len="12" type="button">12 words</button>
+          <button class="tab" data-len="24" type="button">24 words</button>
+        </div>
+      </div>
+
+      <!-- Seed grid -->
+      <div class="field">
+        <div class="field-head">
+          <label>Recovery seed</label>
+          <button class="btn ghost" id="pasteBtn" type="button" style="font-size:11px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.08em;text-transform:uppercase;padding:4px 10px;height:auto">
+            <svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px"><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 5H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-3"/></svg>
+            Paste
+          </button>
+        </div>
+        <div class="seed-grid" id="seedGrid"></div>
+        <div class="match" id="seedStatus">
+          <svg class="ic" viewBox="0 0 24 24" style="width:11px;height:11px"><circle cx="12" cy="12" r="9"/></svg>
+          <span>Awaiting input</span>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <div class="field-head">
+          <label for="ipw">Password</label>
+          <span class="hint">encrypts the wallet on disk</span>
+        </div>
+        <div class="input-wrap">
+          <input class="input has-eye" id="ipw" type="password" placeholder="••••••••••••" />
+          <button class="eye" id="ieye" type="button" aria-label="Show password">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Advanced -->
+      <details class="advanced">
+        <summary>
+          <span class="left">
+            <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
+            Advanced options
+          </span>
+          <svg class="ic chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </summary>
+        <div class="advanced-body">
+          <div class="field">
+            <label>Passphrase (25th word)</label>
+            <input class="input" type="text" placeholder="optional" />
+          </div>
+          <div class="field">
+            <label>Script type</label>
+            <input class="input" type="text" value="Native SegWit · bc1q" />
+          </div>
+        </div>
+      </details>
+
+      <!-- Notice -->
+      <div class="notice">
+        <div class="ico">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+        </div>
+        <div class="body">
+          <strong>Words are checked against the BIP39 wordlist.</strong>
+          Make sure no one is watching your screen — anyone with these words can spend your coins.
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </button>
+      <button class="btn" id="next">
+        <span id="nextLabel">Generate seed</span>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // tabs
+  document.querySelectorAll('.tabs .tab[data-pane]').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tabs .tab[data-pane]').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const which = t.dataset.pane;
+    document.getElementById('pane-create').style.display = which==='create' ? '' : 'none';
+    document.getElementById('pane-import').style.display = which==='import' ? '' : 'none';
+    document.getElementById('nextLabel').textContent = which==='create' ? 'Generate seed' : 'Restore wallet';
+  }));
+
+  // seed length tabs
+  function buildSeedGrid(len){
+    const grid = document.getElementById('seedGrid');
+    grid.innerHTML = '';
+    for(let i=1;i<=len;i++){
+      const cell = document.createElement('label');
+      cell.className = 'seed-cell';
+      cell.innerHTML = `<span class="n">${String(i).padStart(2,'0')}</span><input type="text" autocomplete="off" spellcheck="false" />`;
+      const input = cell.querySelector('input');
+      input.addEventListener('input',()=>{
+        cell.classList.toggle('has-val', !!input.value.trim());
+        updateSeedStatus();
+      });
+      input.addEventListener('paste', e=>{
+        const txt = (e.clipboardData || window.clipboardData).getData('text');
+        const words = txt.trim().split(/\s+/);
+        if(words.length > 1){
+          e.preventDefault();
+          fillSeed(words);
+        }
+      });
+      grid.appendChild(cell);
+    }
+    updateSeedStatus();
+  }
+  function fillSeed(words){
+    const cells = document.querySelectorAll('#seedGrid .seed-cell');
+    cells.forEach((c,i)=>{
+      const inp = c.querySelector('input');
+      inp.value = words[i] || '';
+      c.classList.toggle('has-val', !!inp.value.trim());
+    });
+    updateSeedStatus();
+  }
+  function updateSeedStatus(){
+    const cells = document.querySelectorAll('#seedGrid .seed-cell');
+    const total = cells.length;
+    let filled = 0;
+    cells.forEach(c=>{ if(c.querySelector('input').value.trim()) filled++; });
+    document.getElementById('seedHint').textContent = `${filled} of ${total} words entered`;
+    const status = document.getElementById('seedStatus');
+    status.classList.remove('ok','err');
+    const span = status.querySelector('span');
+    if(filled === 0){ span.textContent = 'Awaiting input'; }
+    else if(filled < total){ span.textContent = `${total-filled} word${total-filled===1?'':'s'} remaining`; }
+    else { status.classList.add('ok'); span.textContent = 'Seed complete · ready to restore'; }
+  }
+  document.querySelectorAll('.tab[data-len]').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab[data-len]').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    buildSeedGrid(parseInt(t.dataset.len,10));
+  }));
+  buildSeedGrid(12);
+
+  // paste full seed
+  document.getElementById('pasteBtn').addEventListener('click', async ()=>{
+    try{
+      const txt = await navigator.clipboard.readText();
+      fillSeed(txt.trim().split(/\s+/));
+    }catch(e){ /* clipboard denied */ }
+  });
+
+  // import password eye
+  const ipw = document.getElementById('ipw');
+  document.getElementById('ieye').addEventListener('click',()=>{ ipw.type = ipw.type==='password' ? 'text' : 'password'; });
+
+  // script type cards
+  document.querySelectorAll('.type-card').forEach(c=>c.addEventListener('click',()=>{
+    document.querySelectorAll('.type-card').forEach(x=>x.classList.remove('selected'));
+    c.classList.add('selected');
+  }));
+
+  // password
+  const pw = document.getElementById('pw');
+  const pw2 = document.getElementById('pw2');
+  const eye = document.getElementById('eye');
+  const sBar = document.getElementById('sBar');
+  const sLabel = document.getElementById('sLabel');
+  const matchEl = document.getElementById('match');
+
+  eye.addEventListener('click',()=>{
+    const t = pw.type === 'password' ? 'text' : 'password';
+    pw.type = t;
+  });
+
+  function scoreOf(v){
+    let s = 0;
+    if(v.length >= 8) s++;
+    if(v.length >= 12) s++;
+    if(/[A-Z]/.test(v)) s++;
+    if(/[0-9]/.test(v)) s++;
+    if(/[^A-Za-z0-9]/.test(v)) s++;
+    return Math.min(s,5);
+  }
+  const LABELS = ['Empty','Weak','Fair','Good','Strong','Excellent'];
+  const COLORS = ['var(--red)','var(--red)','var(--amber)','var(--amber)','var(--green)','var(--green)'];
+
+  function updateStrength(){
+    const v = pw.value;
+    const s = v.length === 0 ? 0 : scoreOf(v);
+    const pct = [0,15,35,55,80,100][s];
+    sBar.style.setProperty('--w', pct+'%');
+    sBar.style.setProperty('--strength-c', COLORS[s]);
+    sLabel.textContent = LABELS[s];
+    sLabel.style.color = COLORS[s];
+    updateMatch();
+  }
+  function updateMatch(){
+    const v1 = pw.value, v2 = pw2.value;
+    matchEl.classList.remove('ok','err');
+    if(!v2){ matchEl.querySelector('span').textContent = 'Awaiting input'; return; }
+    if(v1 === v2){ matchEl.classList.add('ok'); matchEl.querySelector('span').textContent = 'Passwords match'; }
+    else { matchEl.classList.add('err'); matchEl.querySelector('span').textContent = 'Passwords do not match'; }
+  }
+  pw.addEventListener('input', updateStrength);
+  pw2.addEventListener('input', updateMatch);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Coinswap Taker — Welcome</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{
+    --bg: #08080a;
+    --surface: rgba(20,20,24,0.78);
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --text: #f5f5f7;
+    --text-2: #a7a7ad;
+    --text-3: #6c6c72;
+    --orange: #E85002;
+    --orange-2: #FF541B;
+    --green: #2fbf71;
+    --red: #ff4d5a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv11"}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
+
+  /* Ambient background */
+  .ambient{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .glow-1{position:absolute;left:50%;top:-30%;transform:translateX(-50%);width:1100px;height:900px;border-radius:50%;
+    background: radial-gradient(closest-side, rgba(232,80,2,0.28), rgba(232,80,2,0.05) 50%, transparent 70%);
+    filter: blur(50px);}
+  .glow-2{position:absolute;left:-10%;bottom:-20%;width:600px;height:600px;border-radius:50%;
+    background: radial-gradient(closest-side, rgba(255,84,27,0.12), transparent 70%);filter:blur(60px)}
+  .glow-3{position:absolute;right:-10%;top:30%;width:500px;height:500px;border-radius:50%;
+    background: radial-gradient(closest-side, rgba(232,80,2,0.10), transparent 70%);filter:blur(60px)}
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.05;mix-blend-mode:overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");}
+
+  /* Onboarding shell — feels like an app window */
+  .shell{
+    position:relative;z-index:2;
+    width:min(960px,100%);
+    border-radius:32px;
+    background: #101014;
+    border:1px solid var(--border);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.05) inset,
+      0 40px 120px -20px rgba(0,0,0,0.7),
+      0 0 0 1px rgba(255,255,255,0.02);
+    overflow:hidden;
+  }
+
+  /* Faux app titlebar */
+  .titlebar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);position:relative}
+  .traffic{display:flex;gap:8px;align-items:center}
+  .traffic span{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,0.10);display:block}
+  .traffic span:first-child{background:#ff5f57;box-shadow:0 0 0 0.5px rgba(0,0,0,0.2)}
+  .titlebar-name{font-size:12px;color:var(--text-3);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.08em;text-transform:uppercase;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+  .titlebar-right{font-size:11px;color:var(--text-3);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 10px var(--orange)}
+
+  .content{padding:48px 52px 44px;position:relative}
+
+  /* Header */
+  .header{display:flex;flex-direction:column;align-items:flex-start;text-align:left;margin-bottom:36px}
+
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 11px 5px 8px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.02);font-size:10.5px;color:var(--text-2);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:18px}
+  .eyebrow .pip{width:5px;height:5px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 3px rgba(232,80,2,0.18), 0 0 10px var(--orange)}
+
+  h1.title{font-size:clamp(32px,4.4vw,52px);font-weight:700;letter-spacing:-0.035em;line-height:1.0;margin:0 0 14px;text-wrap:balance}
+  h1.title .accent{color:var(--orange);font-style:italic;font-weight:600}
+  .subtitle{color:var(--text-2);font-size:15px;line-height:1.55;max-width:560px;text-wrap:pretty;margin:0}
+
+  /* Stepper */
+  .stepper{display:flex;align-items:center;justify-content:flex-start;gap:10px;margin:28px 0 0;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;color:var(--text-3);letter-spacing:0.1em;text-transform:uppercase;width:100%}
+  .stepper .bar{width:160px;height:3px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden;position:relative}
+  .stepper .bar::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8%;background:linear-gradient(90deg,var(--orange),var(--orange-2));transition:width 0.6s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px rgba(232,80,2,0.6)}
+  .stepper .bar[data-step="1"]::before{width:50%}
+  .stepper .bar[data-step="2"]::before{width:100%}
+
+  /* Cards row */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:34px}
+  @media (max-width:760px){ .cards{grid-template-columns:1fr} }
+
+  .card{
+    position:relative;border-radius:20px;padding:22px;
+    background: #16161a;
+    border:1px solid var(--border);
+    transition: border-color 0.4s, transform 0.4s;
+    overflow:hidden;
+  }
+  .card:hover{transform:translateY(-2px);border-color:var(--border-strong)}
+  .card.is-success{border-color:rgba(47,191,113,0.4)}
+  .card.is-fail{border-color:rgba(255,77,90,0.45)}
+
+  .card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;position:relative;z-index:2}
+  .num{
+    width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13px;color:#fff;flex-shrink:0;
+    background: linear-gradient(160deg, rgba(255,122,61,0.9), var(--orange) 60%, #b53800);
+    box-shadow: 0 6px 16px -4px rgba(232,80,2,0.6), inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+  .card-head h3{margin:0;font-size:17px;font-weight:600;letter-spacing:-0.015em}
+  .card-head .kicker{font-size:10px;color:var(--orange);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.14em;text-transform:uppercase;display:block;margin-bottom:2px}
+
+  .card-body{position:relative;z-index:2}
+  .desc{color:var(--text-2);font-size:13px;line-height:1.55;margin:0 0 14px;text-wrap:pretty}
+
+  .specs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px}
+  .spec{padding:5px 9px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-2)}
+  .spec b{color:var(--text);font-weight:500;margin-left:4px}
+
+  /* Buttons */
+  .btn{
+    width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+    height:46px;border-radius:12px;border:0;cursor:pointer;
+    font-family:inherit;font-size:13.5px;font-weight:600;letter-spacing:-0.005em;color:#fff;
+    background: var(--orange);
+    transition: background 0.2s, transform 0.2s;
+  }
+  .btn:hover{background:#FF6A2A;transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn[disabled]{opacity:0.45;cursor:not-allowed;transform:none}
+  .btn[disabled]:hover{background:var(--orange);transform:none}
+  .btn.secondary{background:rgba(255,255,255,0.05);color:var(--text);border:1px solid var(--border-strong)}
+  .btn.secondary:hover{background:rgba(255,255,255,0.08)}
+  .btn.secondary[disabled]:hover{background:rgba(255,255,255,0.05)}
+
+  .lock-note{margin-top:10px;display:flex;align-items:center;gap:8px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;color:var(--text-3);letter-spacing:0.04em}
+  .lock-note svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Status rows */
+  .status{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+  .status-row{
+    display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;
+    background:rgba(255,255,255,0.03);border:1px solid var(--border);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;
+    opacity:0;transform:translateY(6px);animation: rise 0.4s forwards;
+  }
+  .status-row:nth-child(2){animation-delay:0.1s}
+  .status-row:nth-child(3){animation-delay:0.2s}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .status-row .label{color:var(--text);letter-spacing:0.05em;min-width:54px}
+  .status-row .msg{margin-left:auto;color:var(--text-3);text-align:right}
+  .status-row .indicator{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .status-row.ok .indicator{background:rgba(47,191,113,0.15);color:var(--green)}
+  .status-row.ok .msg{color:var(--green)}
+  .status-row.err .indicator{background:rgba(255,77,90,0.15);color:var(--red)}
+  .status-row.err .msg{color:var(--red)}
+  .status-row.pending .indicator{background:rgba(255,255,255,0.06);color:var(--text-2)}
+  .spinner{width:11px;height:11px;border-radius:50%;border:2px solid rgba(255,255,255,0.18);border-top-color:var(--orange);animation:spin 0.8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Footer area inside shell */
+  .foot{
+    margin-top:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding-top:22px;border-top:1px solid var(--border);
+  }
+  .foot-link{color:var(--text-3);font-size:12.5px;display:flex;align-items:center;gap:8px}
+  .foot-link a{color:var(--orange);text-decoration:none;font-weight:500;border-bottom:1px solid rgba(232,80,2,0.4);padding-bottom:1px}
+  .foot-link a:hover{border-bottom-color:var(--orange)}
+  .skip{background:none;border:0;color:var(--text-3);font-family:inherit;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px}
+  .skip:hover{color:var(--text-2);background:rgba(255,255,255,0.03)}
+
+  /* Continue panel (slides in when both ok) */
+  .continue{
+    position:absolute;left:0;right:0;bottom:-100%;padding:18px 26px;
+    background: #1a1410;
+    border-top:1px solid rgba(232,80,2,0.4);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    transition: bottom 0.5s cubic-bezier(.2,.8,.2,1);
+  }
+  .continue.show{bottom:0}
+  .continue h4{margin:0 0 2px;font-size:14px;font-weight:600;letter-spacing:-0.005em}
+  .continue p{margin:0;color:var(--text-2);font-size:12px}
+  .continue .btn{width:auto;padding:0 22px;height:44px}
+
+  .ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="ambient">
+  <div class="glow-1"></div><div class="glow-2"></div><div class="glow-3"></div>
+</div>
+<div class="grain"></div>
+
+<div class="shell">
+  <div class="titlebar">
+    <div class="traffic"><span></span><span></span><span></span></div>
+    <div class="titlebar-name">Coinswap · Taker</div>
+    <div class="titlebar-right"><span class="dot"></span>Onboarding</div>
+  </div>
+
+  <div class="content">
+    <div class="header">
+      <div class="eyebrow"><span class="pip"></span>Welcome · First-time setup</div>
+      <h1 class="title">Let's get you <span class="accent">connected.</span></h1>
+      <p class="subtitle">Two quick checks — your Bitcoin node and a Tor proxy. After this, you're ready to swap privately.</p>
+
+      <div class="stepper">
+        <span id="stepLabel">Step 00 / 02</span>
+        <div class="bar" id="progress" data-step="0"></div>
+        <span id="stepPct">0%</span>
+      </div>
+    </div>
+
+    <section class="cards">
+      <!-- Card 1: Node -->
+      <article class="card" id="card-node">
+        <div class="card-head">
+          <div class="num">1</div>
+          <div>
+            <span class="kicker">Bitcoin</span>
+            <h3>Test your node</h3>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="desc">Checks RPC, REST, and ZMQ access to your local Bitcoin Core — so your wallet and confirmations stay in sync without a third party.</p>
+          <div class="specs">
+            <div class="spec">RPC<b>:38332</b></div>
+            <div class="spec">ZMQ<b>:28332</b></div>
+            <div class="spec">AUTH<b>cookie</b></div>
+          </div>
+          <button class="btn" data-test="node">
+            <span>Test node connection</span>
+            <svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <div class="status" id="status-node"></div>
+        </div>
+      </article>
+
+      <!-- Card 2: Tor -->
+      <article class="card" id="card-tor">
+        <div class="card-head">
+          <div class="num">2</div>
+          <div>
+            <span class="kicker">Network</span>
+            <h3>Test your Tor proxy</h3>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="desc">Routes all swap traffic through Tor so your IP and coin history stay private — required for maker discovery and coordinator hops.</p>
+          <div class="specs">
+            <div class="spec">SOCKS<b>:9050</b></div>
+            <div class="spec">CTRL<b>:9051</b></div>
+            <div class="spec">AUTH<b>none</b></div>
+          </div>
+          <button class="btn secondary" data-test="tor" disabled>
+            <span>Test Tor connection</span>
+            <svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <div class="lock-note" id="tor-lock">
+            <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+            <span>Unlocks after node test passes</span>
+          </div>
+          <div class="status" id="status-tor"></div>
+        </div>
+      </article>
+    </section>
+
+    <div class="foot">
+      <div class="foot-link">
+        <svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;color:var(--text-3)"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+        Need help? <a href="#">Setup guide</a>
+      </div>
+      <button class="skip">
+        Skip for now
+        <svg class="ic" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="continue" id="continueBar">
+    <div>
+      <h4>All systems green — let's go.</h4>
+      <p>Both endpoints are reachable. You can open your wallet now.</p>
+    </div>
+    <button class="btn">
+      <span>Continue to wallet</span>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  const SCENARIOS = {
+    node: {
+      delay: 1700,
+      results: [
+        [{label:'RPC',state:'ok',msg:'200 OK · 7.4 ms'},{label:'REST',state:'ok',msg:'block 902,418 ✓'},{label:'ZMQ',state:'ok',msg:'rawtx · rawblock'}],
+        [{label:'RPC',state:'err',msg:'Failed to fetch'},{label:'REST',state:'err',msg:'Failed to fetch'},{label:'ZMQ',state:'err',msg:'cannot connect :28332'}]
+      ]
+    },
+    tor: {
+      delay: 1400,
+      results: [
+        [{label:'SOCKS',state:'ok',msg:'circuit ready · 142 ms'},{label:'CTRL',state:'ok',msg:'authenticated'}],
+        [{label:'SOCKS',state:'err',msg:'cannot connect :9050'},{label:'CTRL',state:'err',msg:'cannot connect :9051'}]
+      ]
+    }
+  };
+
+  const iconCheck = `<svg viewBox="0 0 24 24" style="width:10px;height:10px" stroke="currentColor" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`;
+  const iconX = `<svg viewBox="0 0 24 24" style="width:10px;height:10px" stroke="currentColor" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+
+  const runIndex={node:0,tor:0}, passed={node:false,tor:false};
+
+  function renderPending(t, lines){
+    t.innerHTML = lines.map(l=>`<div class="status-row pending"><div class="indicator"><div class="spinner"></div></div><div class="label">${l.label}</div><div class="msg">checking…</div></div>`).join('');
+  }
+  function renderResult(t, lines){
+    t.innerHTML = lines.map(l=>`<div class="status-row ${l.state}"><div class="indicator">${l.state==='ok'?iconCheck:iconX}</div><div class="label">${l.label}</div><div class="msg">${l.msg}</div></div>`).join('');
+  }
+  function updateProgress(){
+    const bar=document.getElementById('progress'),lbl=document.getElementById('stepLabel'),pct=document.getElementById('stepPct');
+    let step=0; if(passed.node) step=1; if(passed.node&&passed.tor) step=2;
+    bar.dataset.step=step;
+    lbl.textContent=['Step 00 / 02','Step 01 / 02','Step 02 / 02'][step];
+    pct.textContent=['0%','50%','100%'][step];
+    document.getElementById('continueBar').classList.toggle('show', step===2);
+
+    const torBtn=document.querySelector('button[data-test="tor"]');
+    const lock=document.getElementById('tor-lock');
+    if(passed.node){
+      torBtn.disabled=false;
+      if(lock) lock.style.display='none';
+    }
+  }
+
+  document.querySelectorAll('button[data-test]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const which=btn.dataset.test;
+      const card=document.getElementById('card-'+which);
+      const target=document.getElementById('status-'+which);
+      const cfg=SCENARIOS[which];
+      btn.disabled=true; card.classList.remove('is-success','is-fail');
+      const skel=which==='node'?[{label:'RPC'},{label:'REST'},{label:'ZMQ'}]:[{label:'SOCKS'},{label:'CTRL'}];
+      renderPending(target,skel);
+      btn.querySelector('span').textContent = which==='node'?'Pinging node…':'Probing circuit…';
+      setTimeout(()=>{
+        const idx=runIndex[which]%cfg.results.length; runIndex[which]++;
+        const lines=cfg.results[idx]; renderResult(target,lines);
+        const ok=lines.every(l=>l.state==='ok');
+        passed[which]=ok; card.classList.add(ok?'is-success':'is-fail');
+        btn.disabled=false;
+        btn.querySelector('span').textContent = ok ? (which==='node'?'Re-test node':'Re-test Tor') : (which==='node'?'Retry':'Retry');
+        updateProgress();
+      },cfg.delay);
+    });
+  });
+</script>
+</body>
+</html>

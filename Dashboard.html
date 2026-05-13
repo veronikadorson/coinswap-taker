@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Coinswap Taker — Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{
+    --bg:#08080a;
+    --surface-1:#101014;
+    --surface-2:#16161a;
+    --surface-3:#1c1c22;
+    --border:rgba(255,255,255,0.08);
+    --border-strong:rgba(255,255,255,0.14);
+    --text:#f5f5f7;
+    --text-2:#a7a7ad;
+    --text-3:#6c6c72;
+    --orange:#E85002;
+    --orange-hover:#FF6A2A;
+    --orange-2:#FF541B;
+    --green:#2fbf71;
+    --red:#ff4d5a;
+    --amber:#ffb547;
+    --blue:#5b8def;
+    --purple:#a979ff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv11"}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+
+  /* App shell */
+  .shell{
+    position:relative;
+    width:min(1320px,100%);
+    border-radius:24px;
+    background:var(--surface-1);
+    border:1px solid var(--border);
+    box-shadow:0 1px 0 rgba(255,255,255,0.05) inset, 0 40px 120px -20px rgba(0,0,0,0.7);
+    overflow:hidden;
+    display:grid;grid-template-columns:68px 1fr;
+    transition:grid-template-columns 0.3s cubic-bezier(.2,.8,.2,1);
+  }
+  .shell.expanded{grid-template-columns:200px 1fr;
+  }
+
+  /* Titlebar overlay */
+  .titlebar{position:absolute;top:0;left:0;right:0;height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);background:var(--surface-1);z-index:5}
+  .traffic{display:flex;gap:8px}
+  .traffic span{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,0.10);display:block}
+  .traffic span:first-child{background:#ff5f57}
+  .traffic span:nth-child(2){background:#febc2e}
+  .traffic span:nth-child(3){background:#28c840}
+  .titlebar-name{font-size:11px;color:var(--text-3);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.1em;text-transform:uppercase;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+  .titlebar-right{font-size:10.5px;color:var(--text-3);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+
+  /* Sidebar */
+  .sidebar{padding:54px 10px 14px;border-right:1px solid var(--border);background:#0d0d11;display:flex;flex-direction:column;overflow:hidden}
+  .brand{padding:8px 6px 14px;margin-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .brand-mark{width:30px;height:30px;border-radius:9px;background:var(--orange);display:flex;align-items:center;justify-content:center;color:#fff;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-weight:700;font-size:13px;flex-shrink:0}
+  .brand-text{display:flex;flex-direction:column;opacity:0;transition:opacity 0.2s;white-space:nowrap;overflow:hidden}
+  .shell.expanded .brand-text{opacity:1}
+  .brand-text h2{margin:0;color:var(--orange);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:15px;font-weight:600;letter-spacing:-0.01em}
+  .brand-text p{margin:2px 0 0;color:var(--text-3);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase}
+  .toggle-btn{margin-left:auto;width:28px;height:28px;border-radius:8px;background:transparent;border:0;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0;transition:opacity 0.2s, color 0.2s}
+  .shell.expanded .toggle-btn{opacity:1}
+  .toggle-btn:hover{color:var(--text)}
+  .toggle-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .collapsed-toggle{position:absolute;top:48px;left:14px;width:38px;height:38px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:6;transition:opacity 0.2s, background 0.2s}
+  .collapsed-toggle:hover{background:var(--surface-3);color:var(--text)}
+  .shell.expanded .collapsed-toggle{opacity:0;pointer-events:none}
+  .collapsed-toggle svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .nav{display:flex;flex-direction:column;gap:4px;margin-top:6px;flex:1}
+  .nav a{
+    display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;
+    color:var(--text-2);font-size:13px;font-weight:500;text-decoration:none;letter-spacing:-0.005em;
+    transition:background 0.2s, color 0.2s;white-space:nowrap;overflow:hidden;
+    position:relative;
+  }
+  .nav a .lbl{opacity:0;transition:opacity 0.2s}
+  .shell.expanded .nav a .lbl{opacity:1}
+  .nav a .ic{margin:0 auto;transition:margin 0.2s}
+  .shell.expanded .nav a .ic{margin:0}
+  .nav a[data-tip]:not(.active):hover::after{
+    content:attr(data-tip);position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);
+    background:var(--surface-3);border:1px solid var(--border-strong);color:var(--text);
+    padding:5px 10px;border-radius:7px;font-size:11.5px;font-weight:500;white-space:nowrap;z-index:10;pointer-events:none;
+  }
+  .shell.expanded .nav a[data-tip]:hover::after{display:none}
+  .nav a:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+  .nav a.active{background:var(--orange);color:#fff}
+  .nav a.active .ic{color:#fff}
+  .nav .ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;color:var(--text-3)}
+  .nav a:hover .ic{color:var(--text)}
+
+  .sidebar-foot{padding:10px 12px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:10px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+  .sidebar-foot .lbl{opacity:0;transition:opacity 0.2s}
+  .shell.expanded .sidebar-foot .lbl{opacity:1}
+  .sidebar-foot .ind{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+
+  /* Main */
+  .main{padding:62px 28px 28px;overflow:hidden;display:flex;flex-direction:column;gap:18px}
+  .page-head{display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .page-head h1{margin:0;font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:34px;font-weight:700;letter-spacing:-0.035em;color:var(--text)}
+  .page-head .meta{display:flex;align-items:center;gap:8px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase}
+  .page-head-right{display:flex;align-items:center;gap:10px}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    height:40px;padding:0 20px;border-radius:999px;border:0;cursor:pointer;
+    font-family:inherit;font-size:12.5px;font-weight:600;letter-spacing:-0.005em;color:#fff;
+    background:var(--orange);transition: background 0.2s, transform 0.2s;
+  }
+  .btn:hover{background:var(--orange-hover);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;color:var(--text-2);border:1px solid var(--border-strong)}
+  .btn.ghost:hover{background:rgba(255,255,255,0.05);color:var(--text);transform:none}
+  .btn.sm{height:30px;padding:0 14px;font-size:11.5px;border-radius:999px}
+
+  /* Balance cards — Hero + secondary trio */
+  .balances{display:grid;grid-template-columns:1.45fr 1fr 1fr 1fr;gap:12px}
+  .bcard{
+    position:relative;padding:20px 20px 18px;border-radius:18px;
+    background:var(--surface-2);border:1px solid var(--border);
+    display:flex;flex-direction:column;gap:10px;overflow:hidden;
+  }
+  .bcard:hover{border-color:var(--border-strong)}
+  .bcard .vlabel{
+    position:absolute;left:8px;top:18px;bottom:18px;
+    writing-mode:vertical-rl;transform:rotate(180deg);
+    font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:9.5px;color:var(--text-3);
+    letter-spacing:0.18em;text-transform:uppercase;display:flex;align-items:flex-start;justify-content:flex-end;
+  }
+  .bcard .label{display:flex;align-items:center;justify-content:space-between;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;color:var(--text-3);letter-spacing:0.1em;text-transform:uppercase}
+  .bcard .label .ic{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .bcard .val{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:28px;font-weight:600;letter-spacing:-0.025em;display:flex;align-items:baseline;gap:6px;line-height:1}
+  .bcard .val small{font-size:11.5px;color:var(--text-3);font-weight:400;letter-spacing:0.04em}
+  .bcard .sub{font-size:11px;color:var(--text-3);line-height:1.45}
+  .bcard.hero{padding:22px 24px;background:linear-gradient(90deg, rgba(232,80,2,0.14), rgba(232,80,2,0.02));border-color:rgba(232,80,2,0.3)}
+  .bcard.hero .val{font-size:54px;font-weight:700;letter-spacing:-0.035em}
+  .bcard.hero .val small{font-size:14px}
+  .bcard.hero .share{margin-top:6px;display:flex;align-items:center;gap:10px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase}
+  .bcard.hero .share .pct{color:var(--orange);font-size:13px;font-weight:600;letter-spacing:0}
+  .bcard.hero .bar{height:3px;flex:1;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;position:relative;max-width:160px}
+  .bcard.hero .bar::before{content:"";position:absolute;left:0;top:0;bottom:0;width:99%;background:linear-gradient(90deg,var(--orange),var(--orange-2));box-shadow:0 0 12px rgba(232,80,2,0.6)}
+  @media (max-width:1100px){.balances{grid-template-columns:1fr 1fr}}
+  .bcard.green .val{color:var(--green)}
+  .bcard.blue .val{color:var(--blue)}
+  .bcard.orange .val{color:var(--orange)}
+  .bcard.purple .val{color:var(--purple)}
+  .bcard.amber .val{color:var(--amber)}
+  .bcard.white .val{color:var(--text)}
+
+  .bcard .accent-line{position:absolute;left:0;top:0;bottom:0;width:2px;background:currentColor;opacity:0.55}
+  .bcard.green .accent-line{color:var(--green)}
+  .bcard.blue .accent-line{color:var(--blue)}
+  .bcard.orange .accent-line{color:var(--orange)}
+  .bcard.purple .accent-line{color:var(--purple)}
+  .bcard.amber .accent-line{color:var(--amber)}
+  .bcard.white .accent-line{color:var(--text)}
+
+  /* Two column lower */
+  .lower{display:grid;grid-template-columns:1.55fr 1fr;gap:14px;flex:1;min-height:0}
+  @media (max-width:1100px){.lower{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--surface-2);border:1px solid var(--border);border-radius:14px;
+    display:flex;flex-direction:column;overflow:hidden;
+  }
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border)}
+  .card-head h3{margin:0;font-size:15px;font-weight:600;letter-spacing:-0.01em}
+  .card-head .count{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase;margin-left:8px}
+  .card-body{padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:12px;min-height:0}
+  .card-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .view-all{color:var(--orange);font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border-bottom:1px solid rgba(232,80,2,0.4);padding-bottom:1px}
+  .view-all:hover{border-bottom-color:var(--orange)}
+
+  /* UTXO mini metrics */
+  .metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .metric{padding:11px 12px;border-radius:10px;background:var(--surface-3);border:1px solid var(--border)}
+  .metric .l{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:9.5px;color:var(--text-3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px}
+  .metric .v{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:18px;font-weight:500;color:var(--text)}
+  .metric.green .v{color:var(--green)}
+  .metric.amber .v{color:var(--amber)}
+
+  .total-value{padding:16px 18px;border-radius:14px;background:linear-gradient(90deg, rgba(232,80,2,0.14), rgba(232,80,2,0.02));border:1px solid rgba(232,80,2,0.3);display:flex;align-items:center;justify-content:space-between}
+  .total-value .l{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10.5px;color:var(--text-2);letter-spacing:0.12em;text-transform:uppercase}
+  .total-value .v{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:28px;color:var(--orange);font-weight:600;letter-spacing:-0.02em}
+
+  /* Filter tabs */
+  .filter-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .filter-tabs{display:flex;gap:4px;padding:3px;background:var(--surface-3);border:1px solid var(--border);border-radius:9px}
+  .filter-tabs{border-radius:999px}
+  .filter-tabs button{
+    padding:6px 13px;border-radius:999px;border:0;background:transparent;cursor:pointer;color:var(--text-2);
+    font-family:inherit;font-size:11.5px;font-weight:500;letter-spacing:-0.005em;
+    display:inline-flex;align-items:center;gap:5px;transition:background 0.2s, color 0.2s;
+  }
+  .filter-tabs button .n{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10px;color:var(--text-3);letter-spacing:0.04em}
+  .filter-tabs button.active{background:var(--orange);color:#fff}
+  .filter-tabs button.active .n{color:rgba(255,255,255,0.85)}
+  .filter-tabs button:hover:not(.active){color:var(--text)}
+
+  /* List */
+  .scroll{flex:1;min-height:0;overflow-y:auto;margin:0 -18px;padding:0 18px;display:flex;flex-direction:column;gap:8px}
+  #utxoList{max-height:222px;flex:0 0 auto}
+  .scroll::-webkit-scrollbar{width:6px}
+  .scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.07);border-radius:3px}
+  .scroll::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.12)}
+
+  /* UTXO row */
+  .utxo-head{display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:14px;padding:0 12px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10px;color:var(--text-3);letter-spacing:0.1em;text-transform:uppercase}
+  .utxo-row{
+    display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:14px;align-items:center;
+    padding:11px 12px;border-radius:10px;background:var(--surface-3);border:1px solid var(--border);
+    transition:border-color 0.2s, background 0.2s;
+  }
+  .utxo-row:hover{border-color:var(--border-strong);background:#1f1f25}
+  .col-txid{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .col-txid .id{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:11.5px;color:var(--text-2);letter-spacing:0.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .col-txid .amt{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:13px;font-weight:500;color:var(--green);letter-spacing:0.01em}
+  .col-pills{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+  .pill{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:9.5px;letter-spacing:0.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;border:1px solid var(--border)}
+  .pill.taproot{background:rgba(169,121,255,0.10);color:var(--purple);border-color:rgba(169,121,255,0.3)}
+  .pill.segwit{background:rgba(91,141,239,0.10);color:var(--blue);border-color:rgba(91,141,239,0.3)}
+  .pill.regular{background:rgba(255,255,255,0.04);color:var(--text-2)}
+  .pill.contract{background:rgba(255,181,71,0.10);color:var(--amber);border-color:rgba(255,181,71,0.3)}
+  .pill.swap{background:rgba(47,191,113,0.10);color:var(--green);border-color:rgba(47,191,113,0.3)}
+  .col-addr{display:flex;flex-direction:column;gap:3px;min-width:0;align-items:flex-start}
+  .col-addr .a{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:11.5px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+  .mempool-link{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10px;color:var(--orange);text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;border-bottom:1px solid rgba(232,80,2,0.35);padding-bottom:1px}
+  .mempool-link:hover{border-bottom-color:var(--orange)}
+  .mempool-link svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+  /* TX row */
+  .tx-row{
+    display:flex;align-items:center;gap:11px;padding:10px 11px;
+    background:var(--surface-3);border:1px solid var(--border);border-radius:10px;
+    transition:border-color 0.2s, background 0.2s;
+  }
+  .tx-row:hover{border-color:var(--border-strong);background:#1f1f25}
+  .tx-arrow{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .tx-arrow svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .tx-row.in .tx-arrow{background:rgba(47,191,113,0.12);color:var(--green)}
+  .tx-row.out .tx-arrow{background:rgba(255,77,90,0.12);color:var(--red)}
+  .tx-row.in .amt{color:var(--green)}
+  .tx-row.out .amt{color:var(--red)}
+  .tx-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .tx-mid .id{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:11px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tx-mid .meta-row{display:flex;align-items:center;gap:6px;font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10px;color:var(--text-3);letter-spacing:0.04em}
+  .conf{padding:2px 6px;border-radius:5px;background:rgba(255,181,71,0.12);color:var(--amber);border:1px solid rgba(255,181,71,0.3);font-size:9.5px;letter-spacing:0.04em;text-transform:uppercase}
+  .conf.full{background:rgba(47,191,113,0.12);color:var(--green);border-color:rgba(47,191,113,0.25)}
+  .tx-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+  .tx-right .amt{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:12.5px;font-weight:500;letter-spacing:0.01em}
+  .tx-right .time{font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:9.5px;color:var(--text-3);letter-spacing:0.04em;text-transform:uppercase}
+
+  .refresh-btn .ic{transition:transform 0.4s}
+  .refresh-btn:hover .ic{transform:rotate(60deg)}
+</style>
+</head>
+<body>
+
+<div class="shell" id="shell">
+  <button class="collapsed-toggle" onclick="document.getElementById('shell').classList.add('expanded')" aria-label="Expand sidebar"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <div class="titlebar">
+    <div class="traffic"><span></span><span></span><span></span></div>
+    <div class="titlebar-name">Coinswap · Taker</div>
+    <div class="titlebar-right"><span class="dot"></span>Mainnet · v0.4.2</div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">C</div>
+      <div class="brand-text"><h2>Coinswap</h2><p>Taker app</p></div>
+      <button class="toggle-btn" onclick="document.getElementById('shell').classList.remove('expanded')" aria-label="Collapse sidebar"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    </div>
+    <nav class="nav">
+      <a href="#" class="active" data-tip="Wallet"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="17" cy="14" r="1" fill="currentColor"/></svg><span class="lbl">Wallet</span></a>
+      <a href="#" data-tip="Market"><svg class="ic" viewBox="0 0 24 24"><path d="M3 20V10M9 20V4M15 20v-8M21 20V8"/></svg><span class="lbl">Market</span></a>
+      <a href="#" data-tip="Send"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="lbl">Send</span></a>
+      <a href="#" data-tip="Receive"><svg class="ic" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span class="lbl">Receive</span></a>
+      <a href="#" data-tip="Swap"><svg class="ic" viewBox="0 0 24 24"><path d="M17 4l4 4-4 4M21 8H8M7 20l-4-4 4-4M3 16h13"/></svg><span class="lbl">Swap</span></a>
+      <a href="#" data-tip="Recovery"><svg class="ic" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0114-5.3L20 8M20 4v4h-4M20 12a8 8 0 01-14 5.3L4 16M4 20v-4h4"/></svg><span class="lbl">Recovery</span></a>
+      <a href="#" data-tip="Log"><svg class="ic" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M14 3v6h6M9 13h6M9 17h6"/></svg><span class="lbl">Log</span></a>
+      <a href="#" data-tip="Settings"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 01-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1A2 2 0 013 17.4l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H2"/></svg><span class="lbl">Settings</span></a>
+    </nav>
+    <div class="sidebar-foot">
+      <span class="ind"></span><span class="lbl">Node OK</span>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Wallet</h1>
+        <div class="meta" style="margin-top:6px"><span>Native SegWit</span><span>·</span><span>m/84'/0'/0'</span><span>·</span><span>Synced 4 min ago</span></div>
+      </div>
+      <div class="page-head-right">
+        <button class="btn ghost sm">Lock</button>
+        <button class="btn refresh-btn">
+          <svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M4 12a8 8 0 0114-5.3L20 8M20 4v4h-4"/><path d="M20 12a8 8 0 01-14 5.3L4 16M4 20v-4h4"/></svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Balance cards -->
+    <section class="balances">
+      <div class="bcard hero orange">
+        <span class="accent-line"></span>
+        <div class="label">Balance</div>
+        <div class="val">0.79499692 <small>BTC</small></div>
+        <div class="sub">Regular wallet coins</div>
+        <div class="share"><span class="pct">99.4%</span><div class="bar"></div><span>of total</span></div>
+      </div>
+      <div class="bcard blue">
+        <span class="accent-line"></span>
+        <div class="label">Swaps</div>
+        <div class="val">0.00497450 <small>BTC</small></div>
+        <div class="sub">Received in swaps</div>
+      </div>
+      <div class="bcard white">
+        <span class="accent-line"></span>
+        <div class="label">Spendable</div>
+        <div class="val">0.79997142 <small>BTC</small></div>
+        <div class="sub">Total available</div>
+      </div>
+      <div class="bcard amber">
+        <span class="accent-line"></span>
+        <div class="label">Contracts</div>
+        <div class="val">0.00000000 <small>BTC</small></div>
+        <div class="sub">In active contracts</div>
+      </div>
+    </section>
+
+    <!-- Lower grid -->
+    <section class="lower">
+      <!-- UTXOs -->
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <h3>UTXOs</h3>
+            <span class="count">2 unspent</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="metrics">
+            <div class="metric"><div class="l">Total UTXOs</div><div class="v">2</div></div>
+            <div class="metric green"><div class="l">Confirmed</div><div class="v">2</div></div>
+            <div class="metric amber"><div class="l">Unconfirmed</div><div class="v">0</div></div>
+          </div>
+          <div class="filter-row">
+            <div class="filter-tabs" id="utxoTabs">
+              <button class="active" data-f="all">All <span class="n">2</span></button>
+              <button data-f="regular">Regular <span class="n">2</span></button>
+              <button data-f="contract">Contract <span class="n">0</span></button>
+              <button data-f="swap">Swap <span class="n">0</span></button>
+              <button data-f="spendable">Spendable <span class="n">2</span></button>
+            </div>
+          </div>
+
+          <div class="utxo-head">
+            <span>Txid · Amount</span>
+            <span>Script · Type</span>
+            <span>Address</span>
+          </div>
+
+          <div class="scroll" id="utxoList"></div>
+        </div>
+        <div class="card-foot">
+          <a href="UTXOs.html" class="view-all">View all UTXOs →</a>
+          <span style="font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10px;color:var(--text-3);letter-spacing:0.06em;text-transform:uppercase">Last updated 4 min ago</span>
+        </div>
+      </div>
+
+      <!-- Recent transactions -->
+      <div class="card">
+        <div class="card-head" style="flex-wrap:wrap;row-gap:10px">
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <h3>Recent transactions</h3>
+            <span class="count" id="txCount">7 total</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div class="filter-tabs" id="txTabs">
+              <button class="active" data-f="all">All</button>
+              <button data-f="in">Received</button>
+              <button data-f="out">Sent</button>
+              <button data-f="swap">Swaps</button>
+            </div>
+            <div class="filter-tabs" id="txSort">
+              <button class="active" data-s="newest">Newest</button>
+              <button data-s="amount">Amount</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="scroll" id="txList"></div>
+        </div>
+        <div class="card-foot">
+          <a href="Transactions.html" class="view-all">View all transactions →</a>
+          <span style="font-family:ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;font-size:10px;color:var(--text-3);letter-spacing:0.06em;text-transform:uppercase">Block 902,418</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const UTXOS = [
+    { txid:'9612c92abee3...027e:0', amt:'0.00497450', script:'taproot', type:'regular', addr:'bcrt1pv0...92jj' },
+    { txid:'15981c285286...3afb:1', amt:'0.79499692', script:'taproot', type:'regular', addr:'bcrt1pp3...0ygz' },
+    { txid:'57f458dc6c97...651c:3', amt:'0.80000000', script:'segwit',  type:'swap',    addr:'bcrt1qsa...wn4d' },
+    { txid:'a3e9f8124b00...18de:0', amt:'0.00250000', script:'taproot', type:'regular', addr:'bcrt1pa9...kx2v' },
+    { txid:'b71203fa9d11...22ef:2', amt:'0.00100000', script:'segwit',  type:'regular', addr:'bcrt1qn4...8j2k' },
+    { txid:'c0a5d3e0fa72...8d12:0', amt:'0.00050000', script:'taproot', type:'contract',addr:'bcrt1px7...tt0p' },
+    { txid:'f29bb8101cce...0f31:1', amt:'0.00012500', script:'segwit',  type:'regular', addr:'bcrt1qz3...gff9' }
+  ];
+  const TXS = [
+    { dir:'in',  id:'9612c92abee3c1c8...e46027e', amt:'+0.00497450', conf:'1/6', time:'4 min ago', t:1, swap:true },
+    { dir:'out', id:'15981c2852865014...1e83afb', amt:'-0.00500000', conf:'3/6', time:'4 min ago', t:2 },
+    { dir:'in',  id:'57f458dc6c977007...593651c3', amt:'+0.80000000', conf:'4/6', time:'9 min ago', t:3 },
+    { dir:'in',  id:'a3e9f8124b00aa12...0f3318de', amt:'+0.00250000', conf:'6/6', time:'1 hr ago', full:true, t:4 },
+    { dir:'out', id:'b71203fa9d11cc4f...2722ef99', amt:'-0.00100000', conf:'6/6', time:'2 hr ago', full:true, t:5 },
+    { dir:'in',  id:'c0a5d3e0fa72b101...8d124a01', amt:'+0.00050000', conf:'6/6', time:'6 hr ago', full:true, t:6 },
+    { dir:'out', id:'f29bb8101cce0042...0f31aa10', amt:'-0.00012500', conf:'6/6', time:'1 day ago', full:true, t:7 }
+  ];
+
+  function renderUTXOs(filter){
+    const list = document.getElementById('utxoList');
+    const rows = UTXOS.filter(u => filter==='all' ? true : filter==='spendable' ? u.type!=='contract' : u.type===filter);
+    list.innerHTML = rows.length ? rows.map(u=>`
+      <div class="utxo-row">
+        <div class="col-txid">
+          <span class="id">${u.txid}</span>
+          <span class="amt">${u.amt} BTC</span>
+        </div>
+        <div class="col-pills">
+          <span class="pill ${u.script}">${u.script==='taproot'?'Taproot':'SegWit'}</span>
+          <span class="pill ${u.type}">${u.type[0].toUpperCase()+u.type.slice(1)}</span>
+        </div>
+        <div class="col-addr">
+          <span class="a">${u.addr}</span>
+          <a href="#" class="mempool-link">Check mempool <svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+        </div>
+      </div>
+    `).join('') : `<div style="padding:24px;text-align:center;color:var(--text-3);font-size:12px">No UTXOs match this filter</div>`;
+  }
+  let txFilter='all', txSort='newest';
+  function renderTXs(){
+    const list = document.getElementById('txList');
+    let rows = TXS.filter(t => txFilter==='all' ? true : txFilter==='swap' ? t.swap : t.dir===txFilter);
+    if(txSort==='amount') rows = rows.slice().sort((a,b)=>Math.abs(parseFloat(b.amt))-Math.abs(parseFloat(a.amt)));
+    else rows = rows.slice().sort((a,b)=>a.t-b.t);
+    document.getElementById('txCount').textContent = rows.length + (rows.length===1?' tx':' total');
+    list.innerHTML = rows.length ? rows.map(t=>`
+      <div class="tx-row ${t.dir}">
+        <div class="tx-arrow">
+          <svg viewBox="0 0 24 24">${t.dir==='in' ? '<path d="M12 5v14M5 12l7 7 7-7"/>' : '<path d="M12 19V5M5 12l7-7 7 7"/>'}</svg>
+        </div>
+        <div class="tx-mid">
+          <span class="id">${t.id}</span>
+          <div class="meta-row"><span class="conf ${t.full?'full':''}">${t.conf} conf</span>${t.swap?'<span class="conf" style="background:rgba(91,141,239,0.12);color:var(--blue);border-color:rgba(91,141,239,0.25)">Swap</span>':''}</div>
+        </div>
+        <div class="tx-right">
+          <span class="amt">${t.amt} BTC</span>
+          <span class="time">${t.time}</span>
+        </div>
+      </div>
+    `).join('') : `<div style="padding:24px;text-align:center;color:var(--text-3);font-size:12px">No transactions match this filter</div>`;
+  }
+
+  document.querySelectorAll('#utxoTabs button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#utxoTabs button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    renderUTXOs(b.dataset.f);
+  }));
+
+  document.querySelectorAll('#txTabs button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#txTabs button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    txFilter = b.dataset.f;
+    renderTXs();
+  }));
+  document.querySelectorAll('#txSort button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#txSort button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    txSort = b.dataset.s;
+    renderTXs();
+  }));
+
+  renderUTXOs('all');
+  renderTXs();
+</script>
+</body>
+</html>
