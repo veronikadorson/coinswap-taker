@@ -177,8 +177,8 @@
           <span class="val">${m.timeRate.toFixed(4)}</span>
           <span class="val muted">${fmtBTCShort(m.minSwap)}</span>
           <span class="val muted">${fmtBTCShort(m.maxSwap)}</span>
-          <span class="val fb-cell">
-            <span class="muted">${fmtBTCShort(m.fidelityBond)}</span>
+          <span class="val muted fb-cell">
+            ${fmtBTCShort(m.fidelityBond)}
             <a href="#" class="fb-link" title="View bond on mempool.space" onclick="event.preventDefault(); event.stopPropagation();">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"></path><path d="M20 4L10 14"></path><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"></path></svg>
             </a>

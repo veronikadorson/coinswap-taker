@@ -60,7 +60,7 @@ body {
 .app { width: 100%; display: flex; justify-content: center; }
 .shell {
   width: min(1320px, 100%);
-  min-height: calc(100vh - 60px);
+  height: calc(100vh - 60px);
   background: var(--surface-1);
   border-radius: 24px;
   border: 1px solid var(--border);
@@ -448,6 +448,10 @@ body {
 .view-all:hover { border-color: var(--orange); color: var(--orange-hover); }
 .view-all .ic { width: 11px; height: 11px; }
 
+/* Market card fills remaining height so the table can scroll */
+.market-card { flex: 1; min-height: 0; }
+.table-row .muted { color: var(--text-3); }
+
 /* ===== Tabs row (Good / Bad / Unresponsive) ===== */
 .maker-tabs {
   display: flex;
@@ -500,7 +504,7 @@ body {
 .tab-meta .sep { color: var(--text-3); opacity: 0.5; }
 
 /* ===== Table ===== */
-.table { display: flex; flex-direction: column; min-height: 0; }
+.table { display: flex; flex-direction: column; min-height: 0; flex: 1; }
 .table-head, .table-row {
   display: grid;
   align-items: center;
