@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Coinswap Taker · Market</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="market.css">
+</head>
+<body>
+
+<div class="app">
+  <div class="shell expanded" id="shell">
+
+    <!-- Titlebar -->
+    <div class="titlebar">
+      <div class="lights">
+        <span class="light r"></span>
+        <span class="light y"></span>
+        <span class="light g"></span>
+      </div>
+      <div class="title-center">Coinswap · Taker</div>
+      <div class="title-right">
+        <span class="dot"></span>
+        <span>Mainnet · v0.4.2</span>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">C</div>
+        <div class="brand-text">
+          <span class="name">Coinswap</span>
+          <span class="sub">Taker app</span>
+        </div>
+        <button class="toggle-btn" id="collapseBtn" aria-label="Collapse sidebar" title="Collapse">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button class="collapsed-toggle" id="expandBtn" aria-label="Expand sidebar" title="Expand">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <nav class="nav">
+        <a href="#" data-tip="Wallet">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M16 13h2"></path><path d="M3 9h15"></path></svg>
+          <span class="label">Wallet</span>
+        </a>
+        <a href="#" class="active" data-tip="Market">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="11"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="19" y1="20" x2="19" y2="14"></line></svg>
+          <span class="label">Market</span>
+        </a>
+        <a href="#" data-tip="Send">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="9 7 17 7 17 15"></polyline></svg>
+          <span class="label">Send</span>
+        </a>
+        <a href="#" data-tip="Receive">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="7" x2="7" y2="17"></line><polyline points="15 17 7 17 7 9"></polyline></svg>
+          <span class="label">Receive</span>
+        </a>
+        <a href="Swap.html" data-tip="Swap">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 4 21 8 17 12"></polyline><line x1="3" y1="8" x2="21" y2="8"></line><polyline points="7 20 3 16 7 12"></polyline><line x1="21" y1="16" x2="3" y2="16"></line></svg>
+          <span class="label">Swap</span>
+        </a>
+        <a href="#" data-tip="Recovery">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.5 8.5-8 9-4.5-.5-8-4.5-8-9V6l8-3z"></path><path d="M9.5 12.5l2 2 3.5-4"></path></svg>
+          <span class="label">Recovery</span>
+        </a>
+        <a href="#" data-tip="Log">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="14" y2="17"></line></svg>
+          <span class="label">Log</span>
+        </a>
+        <a href="#" data-tip="Settings">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.16.39.24.81.24 1.23"></path></svg>
+          <span class="label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-foot">
+        <span class="pip"></span>
+        <span class="lbl">Node OK · Tor OK</span>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main" data-screen-label="Market">
+      <header class="page-head">
+        <div>
+          <h1>Market</h1>
+          <div class="subtitle">Live view of coinswap makers routing through your Tor circuit.</div>
+        </div>
+        <div class="head-actions">
+          <button class="btn refresh-btn" id="refreshBtn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            Refresh
+          </button>
+        </div>
+      </header>
+
+      <!-- Stat cards -->
+      <section class="stats">
+        <div class="bcard amber">
+          <span class="accent-line"></span>
+          <div class="label">Fidelity Locked</div>
+          <div class="val">2.41809274</div>
+          <div class="sub">Bonded across 8 active makers.</div>
+        </div>
+        <div class="bcard orange">
+          <span class="accent-line"></span>
+          <div class="label">Total Liquidity</div>
+          <div class="val">14.92710483</div>
+          <div class="sub">Spendable depth available for routing.</div>
+        </div>
+        <div class="bcard blue">
+          <span class="accent-line"></span>
+          <div class="label">Active Makers</div>
+          <div class="val">8 <small>responding</small></div>
+          <div class="sub">8 good · 2 bad · 0 unresponsive in this window.</div>
+        </div>
+      </section>
+
+      <!-- Maker table card -->
+      <section class="card market-card">
+        <div class="card-head">
+          <div class="maker-tabs">
+            <div class="tabs" id="tabs">
+              <button class="tab good active" data-tab="good">Good Makers <span class="n">8</span></button>
+              <button class="tab bad" data-tab="bad">Bad Makers <span class="n">2</span></button>
+              <button class="tab unres" data-tab="unres">Unresponsive <span class="n">0</span></button>
+            </div>
+            <div class="tab-meta">
+              <span id="lastPoll">Synced 14 s ago</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="table" id="table" data-tab="good">
+            <div class="table-head" id="tableHead"></div>
+            <div class="scroll" id="tableScroll">
+              <div id="tableRows"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-foot">
+          <span id="footMeta">0 selected</span>
+          <button class="btn sm is-disabled" id="swapSelectedBtn" disabled>
+            Swap with selected makers
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><polyline points="17 4 21 8 17 12"></polyline><line x1="3" y1="8" x2="21" y2="8"></line><polyline points="7 20 3 16 7 12"></polyline><line x1="21" y1="16" x2="3" y2="16"></line></svg>
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Calculate modal -->
+<div class="modal-backdrop" id="modalBackdrop" hidden>
+  <div class="modal" role="dialog" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <div>
+        <div class="modal-eyebrow">Fee Calculator</div>
+        <h3 class="modal-title" id="modalTitle">Estimate swap cost</h3>
+        <div class="modal-sub" id="modalMaker">—</div>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="Close">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="6" y1="18" x2="18" y2="6"></line></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label for="swapAmount">Swap amount</label>
+        <div class="input-wrap">
+          <input id="swapAmount" type="number" step="0.001" min="0" value="0.1">
+        </div>
+        <div class="field-hint">
+          <span>Maker range</span>
+          <span class="val" id="rangeHint">0.001 – 1.000</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="locktimePos">Maker position in circuit (n)</label>
+        <div class="input-wrap">
+          <input id="locktimePos" type="number" step="1" min="0" max="9" value="0">
+          <span class="unit">index</span>
+        </div>
+        <div class="field-hint">
+          <span>Refund locktime · 20 × (n + 1)</span>
+          <span class="val" id="locktimeHint">20 blocks</span>
+        </div>
+      </div>
+
+      <div class="formula-block">
+        <div class="formula-label">Formula</div>
+        <div class="formula-line">
+          <span class="fx-tot">Total Fee</span>
+          <span class="fx-eq">=</span>
+          <span>Base Fee</span>
+          <span class="fx-op">+</span>
+          <span>(Swap Amount <span class="fx-op">×</span> Fee Rate)</span>
+          <span class="fx-op">+</span>
+          <span>(Refund Locktime <span class="fx-op">×</span> Swap Amount <span class="fx-op">×</span> Time Rate)</span>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <div class="bd-row">
+          <div>
+            <span class="lbl">Base Fee</span>
+            <span class="formula" id="bdBase">fixed maker fee</span>
+          </div>
+          <span class="v" id="vBase">—</span>
+        </div>
+        <div class="bd-row">
+          <div>
+            <span class="lbl">Volume Fee</span>
+            <span class="formula" id="bdVol">amount × fee rate</span>
+          </div>
+          <span class="v" id="vVol">—</span>
+        </div>
+        <div class="bd-row">
+          <div>
+            <span class="lbl">Time Fee</span>
+            <span class="formula" id="bdTime">locktime × amount × time rate</span>
+          </div>
+          <span class="v" id="vTime">—</span>
+        </div>
+        <div class="bd-row total">
+          <div>
+            <span class="lbl">Total Fee</span>
+            <span class="formula" id="bdPct">— of swap amount</span>
+          </div>
+          <span class="v" id="vTotal">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="note">Estimates exclude on-chain miner fees</span>
+      <button class="btn sm" id="useMakerBtn">Use this maker</button>
+    </div>
+  </div>
+</div>
+
+<script src="market.js"></script>
+</body>
+</html>
